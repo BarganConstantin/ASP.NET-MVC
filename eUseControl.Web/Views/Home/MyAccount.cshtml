@@ -1,0 +1,139 @@
+﻿
+@{
+    ViewBag.Title = "MyAccount";
+}
+
+@model eUseControl.Web.Models.MyAccountData
+
+<!-- breadcrumb-area start -->
+<div class="breadcrumb-area">
+    <div class="container">
+        <div class="row align-items-center justify-content-center">
+            <div class="col-12 text-center">
+                <div class="hero-slide-content text-center">
+
+                    <h2 class="title-1">My Account</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- breadcrumb-area end -->
+<!-- account area start -->
+<div class="account-dashboard pt-100px pb-100px">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 col-md-3 col-lg-3">
+                <!-- Nav tabs -->
+                <div class="dashboard_tab_button" data-aos="fade-up" data-aos-delay="0">
+                    <ul role="tablist" class="nav flex-column dashboard-list">
+                        <li> <a href="#orders" data-bs-toggle="tab" class="nav-link">Orders</a></li>
+
+                        @if (Model.Address != null)
+                        {
+                            <li><a href="#address" data-bs-toggle="tab" class="nav-link">Addresses</a></li>
+                        }
+                        
+                        <li><a href="#pass_edit" data-bs-toggle="tab" class="nav-link">Password</a></li>
+                        <li><a href="@Url.Action("Logout", "Login")" class="nav-link">logout</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-9 col-lg-9">
+                <!-- Tab panes -->
+                <div class="tab-content dashboard_content" data-aos="fade-up" data-aos-delay="200">
+                    <div class="tab-pane fade show active" id="dashboard">
+                        <h4>Dashboard </h4>
+                        <p>From your account dashboard. you can easily check &amp; view your <span style="color: blue;">recent orders</span>, manage your <span style="color: blue;">shipping addresses</span> and <span style="color: blue;">edit your password.</span></p>
+                    </div>
+                    <div class="tab-pane fade" id="orders">
+                        <h4>Orders</h4>
+                        <div class="table_page table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Qty</th>
+                                        <th>Time</th>
+                                        <th>Price</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var order in Model.Orders)
+                                    {
+                                        int total = order.Quantity * order.Price;
+                                        DateTime time = order.AddedDate;
+
+                                        <tr>
+                                            <td>@order.ProductName</td>
+                                            <td>@order.Quantity</td>
+                                            <td>@time.ToString("dd/MM/yyyy") <br> @time.ToString("HH:mm")</td>
+                                            <td>$@order.Price</td>
+                                            <td>$@total</td>
+                                            @if (order.Status == eUseControl.Domain.Enums.OrderStatus.Sent)
+                                            { 
+                                                <td style="color: green;">Sent</td>
+                                            }
+                                            else
+                                            { 
+                                                <td style="color: blue;">In progress</td>
+                                            }
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    @if (Model.Address != null)
+                    {
+                        <div class="tab-pane" id="address">
+                            <p>The following addresses will be used on the checkout page by default.</p>
+                            <h5 class="billing-address">Shipping address</h5>
+                            <a href="@Url.Action("EditAddress", "Order")" class="view">Edit</a>
+                            <p class="mb-2"><strong> @Model.Address.FirstName  @Model.Address.LastName</strong></p>
+                            <address>
+                                <span class="mb-1 d-inline-block"><strong>City:</strong> @Model.Address.City</span>,
+                                <br>
+                                <span class="mb-1 d-inline-block"><strong>State:</strong> @Model.Address.State</span>,
+                                <br>
+                                <span class="mb-1 d-inline-block"><strong>StreetAddress:</strong> @Model.Address.StreetAddress</span>,
+                                <br>
+                                <span class="mb-1 d-inline-block"><strong>ZIP:</strong> @Model.Address.PostCode</span>,
+                                <br>
+                                <span class="mb-1 d-inline-block"><strong>Phone:</strong> @Model.Address.Phone</span>,
+                                <br>
+                                <span><strong>Country:</strong> @Model.Address.Country</span>
+                            </address>
+                        </div>
+                    }
+
+                    <div class="tab-pane" id="pass_edit">
+                        @using (Html.BeginForm("ChangePass", "Login", FormMethod.Post, new { autocomplete = "off" }))
+                        {
+                            @Html.AntiForgeryToken();
+                            @Html.HiddenFor(m => m.Password.UserId, new { @value = Model.Password.UserId });
+                            <div class="col-6">
+                                <div class="form-group" style="margin-bottom: 10px;">
+                                    <label for="exampleInputEmail1">Edit password</label>
+                                    @Html.PasswordFor(m => m.Password.CurrentPassword, new { @class = "form-control", placeholder = "Current password" })
+                                </div>
+                                <div class="form-group" style="margin-bottom: 10px;">
+                                    @Html.PasswordFor(m => m.Password.NewPassword, new { @class = "form-control", placeholder = "New password" })
+                                </div>
+                                <div class="form-group" style="margin-bottom: 10px;">
+                                    @Html.PasswordFor(m => m.Password.RepeatPassword, new { @class = "form-control", placeholder = "Repeat new password" })
+                                </div>
+                            </div>
+                            <div class="col-6 d-flex justify-content-center" style="margin-bottom: 15px;">
+                                <button type="submit" class="col-3" style="border: 1px solid black; border-radius: 8%;">Save</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- account area end -->
